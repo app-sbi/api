@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Documentación API</title>
+  <meta charset="UTF-8" />
+  <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #f7f7f7;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    header img {
+      height: 50px;
+    }
+
+    header h1 {
+      font-family: sans-serif;
+      font-size: 20px;
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <img src="https://tubusquedaweb.com/logo.svg" alt="sbi" />
+    <h1>Documentación API</h1>
+  </header>
+
+  <redoc id="redoc-container"></redoc>
+
+  <script>
+    const spec = {
+      openapi: "3.0.3",
+      info: {
+        title: "API - CRM SBI",
+        version: "1.0.0",
+        description: "Documentación centralizada de todas las APIs del sistema SBI"
+      },
+      servers: [
+
+        {
+          url: "https://tu-api.com",
+          description: "Servidor Producción - Externas"
+        }
+      ],
+      paths: {
+        "/sbi-backend-dev/crm.php": {
+          get: {
+            tags: ["CRM"],
+            summary: "Operaciones GET del CRM",
+            parameters: [
+              {
+                name: "ops",
+                in: "query",
+                required: true,
+                schema: { type: "string", example: "getClientes" }
+              }
+            ],
+            responses: {
+              "200": {
+                description: "Respuesta con datos según operación solicitada"
+              }
+            }
+          },
+          post: {
+            tags: ["CRM"],
+            summary: "Operaciones POST del CRM",
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      ops: { type: "string", example: "addCliente" },
+                      tipo_doc: { type: "string", example: "DNI" },
+                      documento: { type: "string", example: "12345678" },
+                      nombres: { type: "string", example: "Juan Pérez" },
+                      telefono: { type: "string", example: "999999999" }
+                    }
+                  }
+                }
+              }
+            },
+            responses: {
+              "200": {
+                description: "Cliente agregado correctamente"
+              }
+            }
+          }
+        },
+        "/datos": {
+          get: {
+            tags: ["Completo"],
+            summary: "Obtener información completa (datos, SBS, Essalud, etc.)",
+            parameters: [
+              { name: "key", in: "query", required: true, schema: { type: "string" } },
+              { name: "documento", in: "query", required: true, schema: { type: "string" } },
+              { name: "meses", in: "query", required: true, schema: { type: "integer", example: 6 } },
+              { name: "planilla", in: "query", required: false, schema: { type: "integer", example: 6 } }
+            ],
+            responses: {
+              "200": {
+                description: "Devuelve datos generales, SBS, familiares, teléfonos, correos, etc."
+              }
+            }
+          }
+        },
+        "/rcc": {
+          get: {
+            tags: ["RCC"],
+            summary: "Reporte de calificaciones SBS (24 meses)",
+            parameters: [
+              { name: "key", in: "query", required: true, schema: { type: "string" } },
+              { name: "documento", in: "query", required: true, schema: { type: "string" } }
+            ],
+            responses: {
+              "200": {
+                description: "Devuelve historial de calificaciones mensuales (normal, cpp, etc.)"
+              }
+            }
+          }
+        },
+        "/deudas_por_entidad": {
+          get: {
+            tags: ["Deudas por entidad"],
+            summary: "Consulta detallada de deudas por entidad financiera",
+            parameters: [
+              { name: "key", in: "query", required: true, schema: { type: "string" } },
+              { name: "documento", in: "query", required: true, schema: { type: "string" } }
+            ],
+            responses: {
+              "200": {
+                description: "Lista de deudas con empresa, tipo crédito, calificación y atraso"
+              }
+            }
+          }
+        }
+      }
+    };
+
+    Redoc.init(spec, {}, document.getElementById("redoc-container"));
+  </script>
+</body>
+
+</html>
