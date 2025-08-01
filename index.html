@@ -74,9 +74,9 @@ Documentación centralizada de **todas** las APIs del sistema SBI.
             description: "Retorna información general, sbs (utilización y resumen financiero), essalud, correos, familiares, teléfonos, direcciones, vehículos y empresas a partir del documento enviado.",
             parameters: [
               { name: "key", in: "query", required: true, schema: { type: "string" }, description: "Token de autorización" },
-              { name: "documento", in: "query", required: true, schema: { type: "string" }, description: "Token de autorización" },
+              { name: "documento", in: "query", required: true, schema: { type: "string" }, description: "Documento de identidad del cliente" },
               { name: "meses", in: "query", required: true, schema: { type: "integer" }, description: "Cantidad de meses (1 - 12) del historial SBS" },
-              { name: "planilla", in: "query", required: false, schema: { type: "integer" }, description: "antidad de meses (1 - 12) del historial de planilla (opcional)" }
+              { name: "planilla", in: "query", required: false, schema: { type: "integer" }, description: "Cantidad de meses (1 - 12) del historial de planilla (opcional)" }
             ],
             responses: {
               "200": {
@@ -131,8 +131,16 @@ Documentación centralizada de **todas** las APIs del sistema SBI.
                                   items: {
                                     type: "object",
                                     properties: {
-                                      nombre_empresa: { type: "string", description: "Nombre de la empresa" },
-                                      sueldo: { type: "string", description: "Sueldo declarado" }
+                                      fecha: { type: "string", description: "Fecha de la aportación (periodo)" },
+                                      rcu: { type: "string", description: "RCU del empleador" },
+                                      nombre_empresa: { type: "string", description: "Nombre del empleador" },
+                                      sueldo: { type: "string", description: "Sueldo reportado" },
+                                      situacion: { type: "string", description: "Situación laboral" },
+                                      ubigeo: { type: "string", description: "Código ubigeo del centro de trabajo" },
+                                      direccion: { type: "string", description: "Dirección del empleador" },
+                                      distritro: { type: "string", description: "Distrito (verificar si hay typo: debería ser 'distrito')" },
+                                      provincia: { type: "string", description: "Provincia" },
+                                      departamento: { type: "string", description: "Departamento" }
                                     }
                                   }
                                 }
@@ -156,8 +164,11 @@ Documentación centralizada de **todas** las APIs del sistema SBI.
                                 type: "object",
                                 properties: {
                                   documento_familiar: { type: "string", description: "DNI del familiar" },
+                                  paterno_familiar: { type: "string", description: "Apellido paterno del familiar" },
+                                  materno_familiar: { type: "string", description: "Apellido materno del familiar" },
                                   nombres_familiar: { type: "string", description: "Nombres del familiar" },
-                                  parentesco: { type: "string", description: "Tipo de parentesco" }
+                                  nacimiento_familiar: { type: "string", description: "Fecha de nacimiento del familiar" },
+                                  tipo_relacion: { type: "string", description: "Tipo de parentesco" }
                                 }
                               }
                             },
@@ -168,7 +179,11 @@ Documentación centralizada de **todas** las APIs del sistema SBI.
                                 type: "object",
                                 properties: {
                                   telefono: { type: "string", description: "Número telefónico" },
-                                  tipo: { type: "string", description: "Tipo de teléfono (móvil, fijo...)" }
+                                  tipo_telefono: { type: "string", description: "Tipo de teléfono (Móvil, Fijo...)" },
+                                  plan: { type: "string", description: "Plan asociado" },
+                                  modelo_celular: { type: "string", description: "Modelo del celular" },
+                                  origen_data: { type: "string", description: "Fuente de los datos" },
+                                  fecha_data: { type: "string", description: "Fecha de recolección de datos" }
                                 }
                               }
                             },
@@ -178,8 +193,11 @@ Documentación centralizada de **todas** las APIs del sistema SBI.
                               items: {
                                 type: "object",
                                 properties: {
+                                  ubigeo: { type: "string", description: "Código de ubigeo" },
+                                  descripcion_ubigeo: { type: "string", description: "Descripción del ubigeo (Departamento - Provincia - Distrito)" },
                                   direccion: { type: "string", description: "Dirección completa" },
-                                  ubigeo: { type: "string", description: "Código de ubigeo" }
+                                  origen_data: { type: "string", description: "Fuente de la información" },
+                                  fecha_data: { type: "string", description: "Fecha de la información" }
                                 }
                               }
                             },
@@ -191,7 +209,15 @@ Documentación centralizada de **todas** las APIs del sistema SBI.
                                 properties: {
                                   placa: { type: "string", description: "Número de placa" },
                                   marca: { type: "string", description: "Marca del vehículo" },
-                                  modelo: { type: "string", description: "Modelo del vehículo" }
+                                  modelo: { type: "string", description: "Modelo del vehículo" },
+                                  clase: { type: "string", description: "Clase del vehículo" },
+                                  fabricacion: { type: "string", description: "Año de fabricación" },
+                                  compra: { type: "string", description: "Año de compra" },
+                                  nrotransferencia: { type: "string", description: "Número de transferencias" },
+                                  tipo: { type: "string", description: "Tipo de vehículo" },
+                                  documento2: { type: "string", description: "Documento del segundo propietario" },
+                                  nombrecompleto2: { type: "string", description: "Nombre completo del segundo propietario" },
+                                  tipodepropiedad: { type: "string", description: "Tipo de propiedad del vehículo" }
                                 }
                               }
                             },
@@ -202,8 +228,67 @@ Documentación centralizada de **todas** las APIs del sistema SBI.
                                 type: "object",
                                 properties: {
                                   ruc: { type: "string", description: "RUC de la empresa" },
-                                  razon_social: { type: "string", description: "Razón social" },
-                                  tipo: { type: "string", description: "Tipo de vínculo o empresa" }
+                                  razonsocial: { type: "string", description: "Razón social de la empresa" },
+                                  nombrecomercial: { type: "string", description: "Nombre comercial" },
+                                  tipo: { type: "string", description: "Tipo de empresa o vínculo" },
+                                  fecha_inscripcion: { type: "string", description: "Fecha de inscripción en SUNAT" },
+                                  estado: { type: "string", description: "Estado de la empresa" },
+                                  fecha_baja: { type: "string", description: "Fecha de baja (si aplica)" },
+                                  condicion: { type: "string", description: "Condición de la empresa (habido/no habido)" },
+                                  giro: { type: "string", description: "Giro o actividad económica" },
+                                  cargo: { type: "string", description: "Cargo del titular en la empresa" },
+                                  telefonos: {
+                                    type: "array",
+                                    description: "Teléfonos asociados a la empresa",
+                                    items: {
+                                      type: "object",
+                                      properties: {
+                                        telefono: { type: "string", description: "Número telefónico" },
+                                        tipo_telefono: { type: "string", description: "Tipo de teléfono" },
+                                        plan: { type: "string", description: "Plan telefónico" },
+                                        modelo_celular: { type: "string", description: "Modelo de celular" },
+                                        origen_data: { type: "string", description: "Fuente del dato" },
+                                        fecha_data: { type: "string", description: "Fecha del dato" }
+                                      }
+                                    }
+                                  },
+                                  ubigeo: { type: "string", description: "Código de ubigeo" },
+                                  direccion: { type: "string", description: "Dirección fiscal de la empresa" },
+                                  distrito: { type: "string", description: "Distrito" },
+                                  provincia: { type: "string", description: "Provincia" },
+                                  departamento: { type: "string", description: "Departamento" }
+                                }
+                              }
+                            },
+                            utilizacion: {
+                              type: "array",
+                              description: "Información sobre línea de crédito utilizada y no utilizada",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  empresa: { type: "string", description: "Entidad financiera" },
+                                  linea_otorgada: { type: "string", description: "Línea total otorgada" },
+                                  linea_no_utilizada: { type: "string", description: "Monto no utilizado" },
+                                  linea_utilizada: { type: "string", description: "Monto utilizado" }
+                                }
+                              }
+                            },
+                            resumen_financiero: {
+                              type: "array",
+                              description: "Resumen de líneas aprobadas por entidad",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  entidad: { type: "string", description: "Nombre de la entidad financiera" },
+                                  linea_aprobada: { type: "string", description: "Línea total aprobada" },
+                                  tarjeta: { type: "string", description: "Consumo en tarjeta" },
+                                  linea_disponible: { type: "string", description: "Línea disponible" },
+                                  vehicular: { type: "string" },
+                                  hipotecario: { type: "string" },
+                                  comercial: { type: "string" },
+                                  prestamo: { type: "string" },
+                                  convenio: { type: "string" },
+                                  otros: { type: "string" }
                                 }
                               }
                             }
@@ -219,31 +304,134 @@ Documentación centralizada de **todas** las APIs del sistema SBI.
                           status: "ok",
                           data: {
                             generales: {
-                              documento: "0000007",
-                              paterno: "MOLUANTE",
-                              materno: "MEGARRA",
-                              nombres: "DINASTIA CILIA"
+                              documento: "0000000",
+                              paterno: "PEREZ",
+                              materno: "SANCHEZ",
+                              nombres: "JUAN"
                             },
                             sbs: [
                               {
                                 entidad: "BCP",
-                                deuda_total: "11688.15",
+                                deuda_total: "10000.15",
                                 calificacion_normal: "100.00"
                               }
                             ],
                             essalud: {
                               mes1: [
                                 {
-                                  nombre_empresa: "DESPACHO PRESIDENCIAL",
-                                  sueldo: "288.03"
+                                  fecha: "202310",
+                                  rcu: "00000000000",
+                                  nombre_empresa: "CORPORACION XYZ",
+                                  sueldo: "288.03",
+                                  situacion: "A",
+                                  ubigeo: "14101",
+                                  direccion: "JR. DE LA UNION NRO. SN CERCADO DE LIMA (SEGUNDA CUADRA) ",
+                                  distritro: "LIMA",
+                                  provincia: "LIMA",
+                                  departamento: "LIMA",
                                 }
                               ]
                             },
-                            correos: [{ correo: "dinaerciboluarte@hotmail.com" }],
-                            familiares: [{ documento_familiar: "0600012", nombres_familiar: "ENTURA TOMAS" }],
-                            telefonos: [{ telefono: "12223222" }],
-                            direcciones: [{ direccion: "CALLE LOS HALCONES 3 3965" }],
-                            vehiculos: [{ placa: "BBZ005", marca: "HONDA", modelo: "CR-V" }]
+
+                            correos: [{ correo: "juanperez@hotmail.com" }],
+
+                            familiares: [
+                              {
+                                documento_familiar: "00000000",
+                                paterno_familiar: "PEREZ",
+                                materno_familiar: "SANCHEZ",
+                                nombres_familiar: "CACEREZ TOMAS",
+                                nacimiento_familiar: "1980-01-01",
+                                tipo_relacion: "HERMANO",
+                              }],
+
+                            telefonos: [
+                              {
+                                telefono: "12222222",
+                                tipo_telefono: "F",
+                                plan: "",
+                                modelo_celular: " ",
+                                origen_data: "Claro",
+                                fecha_data: "2023-02-28"
+
+
+                              }],
+                            direcciones: [
+                              {
+                                ubigeo: "140131",
+                                descripcion_ubigeo: "LIMA - LIMA - SAN ISIDRO",
+                                direccion: "CALLE LOS HALCONES 3 3333",
+                                origen_data: "Essalud",
+                                fecha_data: "2023-02-28"
+
+                              }],
+                            vehiculos: [
+                              {
+                                placa: "ABC123",
+                                marca: "NISSAN",
+                                modelo: "CR-V",
+                                clase: "-",
+                                fabricacion: "-",
+                                compra: "-",
+                                nrotransferencia: "0",
+                                tipo: "-",
+                                documento2: "-",
+                                nombrecompleto2: "-",
+                                tipodepropiedad: "-",
+                              }],
+
+                            empresas: [
+                              {
+                                ruc: "000000000001",
+                                razonsocial: "CLUB DEPARTAMENTAL LEON",
+                                nombrecomercial: "-",
+                                tipo: "ASOCIACION",
+                                fecha_inscripcion: "19/08/2013",
+                                estado: "ACTIVO",
+                                fecha_baja: "",
+                                condicion: "HABIDO",
+                                giro: "CIIU - 9999 - ACTIVIDADES DE OTRAS ASOCIACIONES N.C.P.",
+                                cargo: "PRESIDENTE",
+                                telefonos: [
+                                  {
+                                    telefono: "13222222",
+                                    tipo_telefono: "F",
+                                    plan: "",
+                                    modelo_celular: "",
+                                    origen_data: "Sunat",
+                                    fecha_data: "2022-06-28"
+                                  },
+                                ],
+                                ubigeo: "140101",
+                                direccion: "AV. BRASIL NRO. 111 ",
+                                distrito: "LIMA",
+                                provincia: "LIMA",
+                                departamento: "LIMA"
+                              }],
+
+                            utilizacion: [
+                              {
+                                empresa: "BCP",
+                                linea_otorgada: "40000.00",
+                                linea_no_utilizada: "30000.00",
+                                linea_utilizada: "10000.15"
+                              }
+                            ],
+                            resumen_financiero: [
+                              {
+                                entidad: "BCP",
+                                linea_aprobada: "40000.00",
+                                tarjeta: "10000.15",
+                                linea_disponible: "30000.00",
+                                vehicular: "0",
+                                hipotecario: "0",
+                                comercial: "0",
+                                prestamo: "0",
+                                convenio: "0",
+                                otros: "0"
+                              }
+                            ]
+
                           }
                         }
                       }
