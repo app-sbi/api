@@ -48,9 +48,9 @@
     const spec = {
       openapi: "3.0.3",
       info: {
-        title: "API - CRM SBI",
+        title: "API",
         version: "1.0.0",
-        description: "Documentación centralizada de **todas** las APIs del sistema SBI.\n\n- SBS\n- Essalud\n- Deudas por entidad\n- Datos por persona"
+        description: "Documentación centralizada de **todas** las APIs del sistema SBI."
       },
       servers: [
         {
@@ -60,166 +60,283 @@
       ],
       paths: {
         "/datos": {
-          post: {
-            tags: ["Completo"],
-            summary: "Obtener información completa (datos, SBS, Essalud, etc.)",
-            description: "Este endpoint devuelve información general, SBS y Essalud a partir del documento enviado.",
-            requestBody: {
-              required: true,
-              content: {
-                "application/json": {
-                  schema: {
-                    type: "object",
-                    properties: {
-                      key: {
-                        type: "string",
-                        description: "Token de autorización",
-                        example: "api-key-123"
-                      },
-                      documento: {
-                        type: "string",
-                        description: "Número de documento del cliente",
-                        example: "12345678"
-                      },
-                      meses: {
-                        type: "integer",
-                        description: "Cantidad de meses de historial",
-                        example: 6
-                      },
-                      planilla: {
-                        type: "integer",
-                        description: "Filtro de meses para planilla (opcional)",
-                        example: 6
-                      }
-                    },
-                    required: ["key", "documento", "meses"]
-                  }
-                }
-              }
-            },
-            responses: {
-              "200": {
-                description: "Datos obtenidos correctamente"
-              }
-            }
-          }
-        },
-
-        "/persona/{documento}": {
           get: {
             tags: ["Completo"],
-            summary: "Retorna persona",
-            description: "Obtiene la información de una persona a partir de su documento de identidad.",
+            summary: "Obtener información completa (datos, SBS, Essalud, etc.)",
+            description: "Devuelve información general, SBS y Essalud a partir del documento enviado.",
             parameters: [
-              {
-                name: "documento",
-                in: "path",
-                required: true,
-                schema: {
-                  type: "string",
-                  example: "12345678"
-                },
-                description: "Número de documento (DNI, RUC, etc.)"
-              }
+              { name: "key", in: "query", required: true, schema: { type: "string" }, description: "Token de autorización" },
+              { name: "documento", in: "query", required: true, schema: { type: "string" }, description: "Número de documento del cliente" },
+              { name: "meses", in: "query", required: true, schema: { type: "integer" }, description: "Meses de historial" },
+              { name: "planilla", in: "query", required: false, schema: { type: "integer" }, description: "Meses de planilla (opcional)" }
             ],
             responses: {
               "200": {
-                description: "Operación exitosa - Información de la persona",
+                description: "Datos obtenidos correctamente",
                 content: {
                   "application/json": {
-                    example: {
-                      documento: "12345678",
-                      nombres: "JUAN PÉREZ",
-                      telefono: "999999999",
-                      correo: "juan@example.com",
-                      direccion: "Av. Principal 123",
-                      ocupacion: "Analista de datos",
-                      sbs: {
-                        calificacion: "Normal",
-                        entidades: ["BCP", "Interbank"]
-                      },
-                      essalud: {
-                        afiliado: true,
-                        empresa: "Mi Empresa SAC"
+                    schema: {
+                      type: "object",
+                      properties: {
+                        status: {
+                          type: "string",
+                          description: "Estado de la operación (ok o error)",
+                          example: "ok"
+                        },
+                        data: {
+                          type: "object",
+                          description: "Datos completos obtenidos del cliente",
+                          properties: {
+                            generales: {
+                              type: "object",
+                              description: "Datos personales generales del cliente",
+                              properties: {
+                                documento: { type: "string", description: "Número de documento" },
+                                paterno: { type: "string", description: "Apellido paterno" },
+                                materno: { type: "string", description: "Apellido materno" },
+                                nombres: { type: "string", description: "Nombres completos" },
+                                fecha_nacimiento: { type: "string", description: "Fecha de nacimiento" },
+                                sexo: { type: "string", description: "Sexo del cliente" },
+                                tipo_documento: { type: "string", description: "Tipo de documento" }
+                              }
+                            },
+                            sbs: {
+                              type: "array",
+                              description: "Resumen financiero según SBS",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  entidad: { type: "string", description: "Nombre de la entidad financiera" },
+                                  deuda_total: { type: "string", description: "Monto total de deuda" },
+                                  calificacion: { type: "string", description: "Calificación del cliente (Normal, CPP, etc.)" },
+                                  moneda: { type: "string", description: "Moneda de la deuda" }
+                                }
+                              }
+                            },
+                            essalud: {
+                              type: "object",
+                              description: "Historial de aportes a Essalud",
+                              properties: {
+                                mes1: {
+                                  type: "array",
+                                  description: "Aportes del mes 1",
+                                  items: {
+                                    type: "object",
+                                    properties: {
+                                      nombre_empresa: { type: "string", description: "Nombre de la empresa" },
+                                      sueldo: { type: "string", description: "Sueldo declarado" }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            correos: {
+                              type: "array",
+                              description: "Lista de correos electrónicos",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  correo: { type: "string", description: "Correo electrónico" },
+                                  tipo: { type: "string", description: "Tipo de correo (personal, laboral...)" }
+                                }
+                              }
+                            },
+                            familiares: {
+                              type: "array",
+                              description: "Listado de familiares relacionados",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  documento_familiar: { type: "string", description: "DNI del familiar" },
+                                  nombres_familiar: { type: "string", description: "Nombres del familiar" },
+                                  parentesco: { type: "string", description: "Tipo de parentesco" }
+                                }
+                              }
+                            },
+                            telefonos: {
+                              type: "array",
+                              description: "Lista de números telefónicos",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  telefono: { type: "string", description: "Número telefónico" },
+                                  tipo: { type: "string", description: "Tipo de teléfono (móvil, fijo...)" }
+                                }
+                              }
+                            },
+                            direcciones: {
+                              type: "array",
+                              description: "Direcciones registradas del cliente",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  direccion: { type: "string", description: "Dirección completa" },
+                                  ubigeo: { type: "string", description: "Código de ubigeo" }
+                                }
+                              }
+                            },
+                            vehiculos: {
+                              type: "array",
+                              description: "Vehículos asociados al cliente",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  placa: { type: "string", description: "Número de placa" },
+                                  marca: { type: "string", description: "Marca del vehículo" },
+                                  modelo: { type: "string", description: "Modelo del vehículo" }
+                                }
+                              }
+                            },
+                            empresas: {
+                              type: "array",
+                              description: "Empresas vinculadas al cliente",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  ruc: { type: "string", description: "RUC de la empresa" },
+                                  razon_social: { type: "string", description: "Razón social" },
+                                  tipo: { type: "string", description: "Tipo de vínculo o empresa" }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+
+                    },
+                    examples: {
+                      ejemplo: {
+                        summary: "Respuesta completa de ejemplo",
+                        value: {
+                          status: "ok",
+                          data: {
+                            generales: {
+                              documento: "06256217",
+                              paterno: "BOLUARTE",
+                              materno: "ZEGARRA",
+                              nombres: "DINA ERCILIA"
+                            },
+                            sbs: [
+                              {
+                                entidad: "BCP",
+                                deuda_total: "11688.15",
+                                calificacion_normal: "100.00"
+                              }
+                            ],
+                            essalud: {
+                              mes1: [
+                                {
+                                  nombre_empresa: "DESPACHO PRESIDENCIAL",
+                                  sueldo: "288.03"
+                                }
+                              ]
+                            },
+                            correos: [{ correo: "dinaerciboluarte@hotmail.com" }],
+                            familiares: [{ documento_familiar: "06082403", nombres_familiar: "VENTURA TOMASA" }],
+                            telefonos: [{ telefono: "12226222" }],
+                            direcciones: [{ direccion: "CALLE LOS HALCONES 3 3965" }],
+                            vehiculos: [{ placa: "BBZ005", marca: "HONDA", modelo: "CR-V" }]
+                          }
+                        }
                       }
                     }
                   }
                 }
-              },
-              "404": {
-                description: "Persona no encontrada con el documento ingresado"
               }
             }
           }
         },
-
         "/rcc": {
-          post: {
+          get: {
             tags: ["RCC"],
             summary: "Reporte de calificaciones SBS (24 meses)",
-            description: "Devuelve el historial de calificaciones crediticias del cliente en los últimos 24 meses.",
-            requestBody: {
-              required: true,
-              content: {
-                "application/json": {
-                  schema: {
-                    type: "object",
-                    properties: {
-                      key: {
-                        type: "string",
-                        description: "Token de autorización",
-                        example: "api-key-123"
-                      },
-                      documento: {
-                        type: "string",
-                        description: "Número de documento del cliente",
-                        example: "12345678"
+            description: "Devuelve historial de calificaciones del cliente en los últimos 24 meses.",
+            parameters: [
+              { name: "key", in: "query", required: true, schema: { type: "string" } },
+              { name: "documento", in: "query", required: true, schema: { type: "string" } }
+            ],
+            responses: {
+              "200": {
+                description: "Historial de calificaciones mensuales (normal, cpp, deficiente, etc.).",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        status: {
+                          type: "string",
+                          example: "ok",
+                          description: "Estado de la operación"
+                        },
+                        data: {
+                          type: "array",
+                          description: "Historial de calificaciones de los últimos 24 meses",
+                          items: {
+                            type: "object",
+                            properties: {
+                              documento: { type: "string", example: "77777777", description: "Número de documento" },
+                              cantidad_empresas: { type: "string", example: "2", description: "Cantidad de empresas reportadas" },
+                              periodo: { type: "string", example: "2023-07-31", description: "Mes del reporte" },
+                              normal: { type: "string", example: "100.00", description: "Porcentaje en estado Normal" },
+                              cpp: { type: "string", example: "0.00", description: "Porcentaje en estado CPP" },
+                              deficiente: { type: "string", example: "0.00", description: "Porcentaje en estado Deficiente" },
+                              dudoso: { type: "string", example: "0.00", description: "Porcentaje en estado Dudoso" },
+                              perdida: { type: "string", example: "0.00", description: "Porcentaje en estado Pérdida" }
+                            }
+                          }
+                        }
                       }
-                    },
-                    required: ["key", "documento"]
+                    }
+
                   }
                 }
               }
-            },
-            responses: {
-              "200": {
-                description: "Devuelve historial de calificaciones mensuales (normal, cpp, deficiente, etc.)."
-              }
             }
           }
         },
-
         "/deudas_por_entidad": {
-          post: {
+          get: {
             tags: ["Deudas por entidad"],
             summary: "Consulta detallada de deudas por entidad financiera",
             description: "Devuelve relación de deudas por entidad financiera, tipo de crédito, calificación y monto.",
-            requestBody: {
-              required: true,
-              content: {
-                "application/json": {
-                  schema: {
-                    type: "object",
-                    properties: {
-                      key: {
-                        type: "string",
-                        description: "Token de autorización",
-                        example: "api-key-123"
-                      },
-                      documento: {
-                        type: "string",
-                        description: "Documento del cliente a consultar",
-                        example: "12345678"
-                      }
-                    },
-                    required: ["key", "documento"]
-                  }
-                }
-              }
-            },
+            parameters: [
+              { name: "key", in: "query", required: true, schema: { type: "string" } },
+              { name: "documento", in: "query", required: true, schema: { type: "string" } }
+            ],
             responses: {
               "200": {
-                description: "Lista detallada de deudas con empresa, tipo de crédito, calificación SBS y atraso."
+                description: "Lista detallada de deudas.",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object",
+                      properties: {
+                        status: {
+                          type: "string",
+                          example: "ok",
+                          description: "Estado de la operación"
+                        },
+                        data: {
+                          type: "array",
+                          description: "Lista de deudas encontradas",
+                          items: {
+                            type: "object",
+                            properties: {
+                              documento: { type: "string", example: "77777777", description: "Número de documento" },
+                              empresa: { type: "string", example: "BANCO ALFIN", description: "Nombre de la entidad financiera" },
+                              tipo_credito: { type: "string", example: "PRESTAMO", description: "Tipo de crédito" },
+                              monto: { type: "string", example: "118.00", description: "Monto de la deuda" },
+                              calificacion: { type: "string", example: "DEF", description: "Calificación crediticia" },
+                              dias_atraso: { type: "string", example: "41", description: "Días de atraso" },
+                              fecha: { type: "string", example: "2023-07-31", description: "Fecha del reporte" }
+                            }
+                          }
+                        }
+                      }
+                    }
+
+                  }
+                }
               }
             }
           }
