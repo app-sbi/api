@@ -48,10 +48,18 @@
     const spec = {
       openapi: "3.0.3",
       info: {
-        title: "API",
+        title: "SBI – APIs",
         version: "1.0.0",
-        description: "Documentación centralizada de **todas** las APIs del sistema SBI."
+        description: `
+Documentación centralizada de **todas** las APIs del sistema SBI.
+
+• **Completo**  
+• **Deudas por entidad**  
+• **RCC**
+`
+
       },
+
       servers: [
         {
           url: "https://tu-api.com",
@@ -62,13 +70,13 @@
         "/datos": {
           get: {
             tags: ["Completo"],
-            summary: "Obtener información completa (datos, SBS, Essalud, etc.)",
-            description: "Devuelve información general, SBS y Essalud a partir del documento enviado.",
+            summary: "Obtiene información completa de la persona buscada.",
+            description: "Retorna información general, sbs (utilización y resumen financiero), essalud, correos, familiares, teléfonos, direcciones, vehículos y empresas a partir del documento enviado.",
             parameters: [
               { name: "key", in: "query", required: true, schema: { type: "string" }, description: "Token de autorización" },
-              { name: "documento", in: "query", required: true, schema: { type: "string" }, description: "Número de documento del cliente" },
-              { name: "meses", in: "query", required: true, schema: { type: "integer" }, description: "Meses de historial" },
-              { name: "planilla", in: "query", required: false, schema: { type: "integer" }, description: "Meses de planilla (opcional)" }
+              { name: "documento", in: "query", required: true, schema: { type: "string" }, description: "Token de autorización" },
+              { name: "meses", in: "query", required: true, schema: { type: "integer" }, description: "Cantidad de meses (1 - 12) del historial SBS" },
+              { name: "planilla", in: "query", required: false, schema: { type: "integer" }, description: "antidad de meses (1 - 12) del historial de planilla (opcional)" }
             ],
             responses: {
               "200": {
@@ -266,7 +274,7 @@
                         status: {
                           type: "string",
                           example: "ok",
-                          description: "Estado de la operación"
+                          description: "ok (se encontraron datos del documento enviado), error (documento sin datos)"
                         },
                         data: {
                           type: "array",
@@ -314,7 +322,7 @@
                         status: {
                           type: "string",
                           example: "ok",
-                          description: "Estado de la operación"
+                          description: "ok (se encontraron datos del documento enviado), error (documento sin datos)"
                         },
                         data: {
                           type: "array",
