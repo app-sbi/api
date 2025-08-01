@@ -4,9 +4,13 @@
 <head>
   <title>Documentación API</title>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="https://tubusquedaweb.com/favicon.png" />
   <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
   <style>
-    body {
+    html,
+    body,
+    #redoc-container {
+      height: 100%;
       margin: 0;
       padding: 0;
     }
@@ -38,7 +42,7 @@
     <h1>Documentación API</h1>
   </header>
 
-  <redoc id="redoc-container"></redoc>
+  <div id="redoc-container"></div>
 
   <script>
     const spec = {
@@ -46,37 +50,20 @@
       info: {
         title: "API - CRM SBI",
         version: "1.0.0",
-        description: "Documentación centralizada de todas las APIs del sistema SBI"
+        description: "Documentación centralizada de **todas** las APIs del sistema SBI.\n\n- SBS\n- Essalud\n- Deudas por entidad\n- Datos por persona"
       },
       servers: [
-
         {
           url: "https://tu-api.com",
           description: "Servidor Producción - Externas"
         }
       ],
       paths: {
-        "/sbi-backend-dev/crm.php": {
-          get: {
-            tags: ["CRM"],
-            summary: "Operaciones GET del CRM",
-            parameters: [
-              {
-                name: "ops",
-                in: "query",
-                required: true,
-                schema: { type: "string", example: "getClientes" }
-              }
-            ],
-            responses: {
-              "200": {
-                description: "Respuesta con datos según operación solicitada"
-              }
-            }
-          },
+        "/datos": {
           post: {
-            tags: ["CRM"],
-            summary: "Operaciones POST del CRM",
+            tags: ["Completo"],
+            summary: "Obtener información completa (datos, SBS, Essalud, etc.)",
+            description: "Este endpoint devuelve información general, SBS y Essalud a partir del documento enviado.",
             requestBody: {
               required: true,
               content: {
@@ -84,66 +71,155 @@
                   schema: {
                     type: "object",
                     properties: {
-                      ops: { type: "string", example: "addCliente" },
-                      tipo_doc: { type: "string", example: "DNI" },
-                      documento: { type: "string", example: "12345678" },
-                      nombres: { type: "string", example: "Juan Pérez" },
-                      telefono: { type: "string", example: "999999999" }
-                    }
+                      key: {
+                        type: "string",
+                        description: "Token de autorización",
+                        example: "api-key-123"
+                      },
+                      documento: {
+                        type: "string",
+                        description: "Número de documento del cliente",
+                        example: "12345678"
+                      },
+                      meses: {
+                        type: "integer",
+                        description: "Cantidad de meses de historial",
+                        example: 6
+                      },
+                      planilla: {
+                        type: "integer",
+                        description: "Filtro de meses para planilla (opcional)",
+                        example: 6
+                      }
+                    },
+                    required: ["key", "documento", "meses"]
                   }
                 }
               }
             },
             responses: {
               "200": {
-                description: "Cliente agregado correctamente"
+                description: "Datos obtenidos correctamente"
               }
             }
           }
         },
-        "/datos": {
+
+        "/persona/{documento}": {
           get: {
             tags: ["Completo"],
-            summary: "Obtener información completa (datos, SBS, Essalud, etc.)",
+            summary: "Retorna persona",
+            description: "Obtiene la información de una persona a partir de su documento de identidad.",
             parameters: [
-              { name: "key", in: "query", required: true, schema: { type: "string" } },
-              { name: "documento", in: "query", required: true, schema: { type: "string" } },
-              { name: "meses", in: "query", required: true, schema: { type: "integer", example: 6 } },
-              { name: "planilla", in: "query", required: false, schema: { type: "integer", example: 6 } }
+              {
+                name: "documento",
+                in: "path",
+                required: true,
+                schema: {
+                  type: "string",
+                  example: "12345678"
+                },
+                description: "Número de documento (DNI, RUC, etc.)"
+              }
             ],
             responses: {
               "200": {
-                description: "Devuelve datos generales, SBS, familiares, teléfonos, correos, etc."
+                description: "Operación exitosa - Información de la persona",
+                content: {
+                  "application/json": {
+                    example: {
+                      documento: "12345678",
+                      nombres: "JUAN PÉREZ",
+                      telefono: "999999999",
+                      correo: "juan@example.com",
+                      direccion: "Av. Principal 123",
+                      ocupacion: "Analista de datos",
+                      sbs: {
+                        calificacion: "Normal",
+                        entidades: ["BCP", "Interbank"]
+                      },
+                      essalud: {
+                        afiliado: true,
+                        empresa: "Mi Empresa SAC"
+                      }
+                    }
+                  }
+                }
+              },
+              "404": {
+                description: "Persona no encontrada con el documento ingresado"
               }
             }
           }
         },
+
         "/rcc": {
-          get: {
+          post: {
             tags: ["RCC"],
             summary: "Reporte de calificaciones SBS (24 meses)",
-            parameters: [
-              { name: "key", in: "query", required: true, schema: { type: "string" } },
-              { name: "documento", in: "query", required: true, schema: { type: "string" } }
-            ],
+            description: "Devuelve el historial de calificaciones crediticias del cliente en los últimos 24 meses.",
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      key: {
+                        type: "string",
+                        description: "Token de autorización",
+                        example: "api-key-123"
+                      },
+                      documento: {
+                        type: "string",
+                        description: "Número de documento del cliente",
+                        example: "12345678"
+                      }
+                    },
+                    required: ["key", "documento"]
+                  }
+                }
+              }
+            },
             responses: {
               "200": {
-                description: "Devuelve historial de calificaciones mensuales (normal, cpp, etc.)"
+                description: "Devuelve historial de calificaciones mensuales (normal, cpp, deficiente, etc.)."
               }
             }
           }
         },
+
         "/deudas_por_entidad": {
-          get: {
+          post: {
             tags: ["Deudas por entidad"],
             summary: "Consulta detallada de deudas por entidad financiera",
-            parameters: [
-              { name: "key", in: "query", required: true, schema: { type: "string" } },
-              { name: "documento", in: "query", required: true, schema: { type: "string" } }
-            ],
+            description: "Devuelve relación de deudas por entidad financiera, tipo de crédito, calificación y monto.",
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      key: {
+                        type: "string",
+                        description: "Token de autorización",
+                        example: "api-key-123"
+                      },
+                      documento: {
+                        type: "string",
+                        description: "Documento del cliente a consultar",
+                        example: "12345678"
+                      }
+                    },
+                    required: ["key", "documento"]
+                  }
+                }
+              }
+            },
             responses: {
               "200": {
-                description: "Lista de deudas con empresa, tipo crédito, calificación y atraso"
+                description: "Lista detallada de deudas con empresa, tipo de crédito, calificación SBS y atraso."
               }
             }
           }
@@ -151,7 +227,11 @@
       }
     };
 
-    Redoc.init(spec, {}, document.getElementById("redoc-container"));
+    Redoc.init(spec, {
+      scrollYOffset: 60,
+      expandResponses: "200,404",
+      requiredPropsFirst: true
+    }, document.getElementById("redoc-container"));
   </script>
 </body>
 
