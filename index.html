@@ -4,43 +4,46 @@
 <head>
   <title>Documentación API</title>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="https://tubusquedaweb.com/favicon.png" />
+  <link rel="icon" href="https://tubusquedaweb.com/favicon.png" />
   <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+
   <style>
-    html,
     body,
-    #redoc-container {
-      height: 100%;
+    html {
       margin: 0;
       padding: 0;
+      height: 100%;
     }
 
-    header {
-      background: #f7f7f7;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      border-bottom: 1px solid #ccc;
+    #redoc-container {
+      height: 100vh;
     }
 
-    header img {
-      height: 50px;
+    img[alt="SBI"] {
+      display: block;
+      margin: 12px auto 0 auto;
+      height: 48px !important;
+      max-width: 100%;
     }
 
-    header h1 {
+    .sidebar-title-sbi {
+      display: block;
+      text-align: center;
       font-family: sans-serif;
-      font-size: 20px;
-      margin: 0;
+      font-size: 14px;
+      font-weight: 530;
+      color: #007bff;
+      margin-top: 4px;
+
+
+
     }
   </style>
 </head>
 
+
 <body>
-  <header>
-    <img src="https://tubusquedaweb.com/logo.svg" alt="sbi" />
-    <h1>Documentación API</h1>
-  </header>
+
 
   <div id="redoc-container"></div>
 
@@ -56,9 +59,13 @@ Documentación centralizada de **todas** las APIs del sistema SBI.
 • **Completo**  
 • **Deudas por entidad**  
 • **RCC**
-`
-
+`,
+        "x-logo": {
+          url: "https://tubusquedaweb.com/logo.svg",
+          altText: "SBI"
+        }
       },
+
 
       servers: [
         {
@@ -541,10 +548,26 @@ Documentación centralizada de **todas** las APIs del sistema SBI.
     };
 
     Redoc.init(spec, {
-      scrollYOffset: 60,
       expandResponses: "200,404",
-      requiredPropsFirst: true
+      requiredPropsFirst: true,
+      hideDownloadButton: false,
+      theme: {
+        sidebar: {
+          backgroundColor: "#fff",
+          textColor: "#000"
+        }
+      }
     }, document.getElementById("redoc-container"));
+    setTimeout(() => {
+      const logo = document.querySelector('img[alt="SBI"]');
+      if (logo && !document.querySelector('.sidebar-title-sbi')) {
+        const label = document.createElement('span');
+        label.textContent = 'SBI';
+        label.className = 'sidebar-title-sbi';
+        logo.parentNode.insertBefore(label, logo.nextSibling);
+      }
+    }, 500);
+
   </script>
 </body>
 
