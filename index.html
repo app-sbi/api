@@ -95,7 +95,7 @@ Documentación centralizada de todas las APIs del sistema SBI.
                       properties: {
                         status: {
                           type: "string",
-                          description: "Estado de la operación (ok o error)",
+                          description: "ok (se encontraron datos del documento enviado), error (documento sin datos)",
                           example: "ok"
                         },
                         data: {
@@ -460,7 +460,7 @@ Documentación centralizada de todas las APIs del sistema SBI.
             ],
             responses: {
               "200": {
-                description: "Historial de calificaciones mensuales (normal, cpp, deficiente, etc.).",
+                description: "Datos obtenidos correctamente",
                 content: {
                   "application/json": {
                     schema: {
@@ -508,7 +508,7 @@ Documentación centralizada de todas las APIs del sistema SBI.
             ],
             responses: {
               "200": {
-                description: "Lista detallada de deudas.",
+                description: "Datos obtenidos correctamente",
                 content: {
                   "application/json": {
                     schema: {
