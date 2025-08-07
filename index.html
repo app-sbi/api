@@ -472,7 +472,7 @@ Documentación centralizada de todas las APIs del sistema SBI.
                               {
                                 entidad: "BCP",
                                 linea_aprobada: "40000.00",
-                                tarjeta: "10000.15",
+                                tarjeta: "10000.00",
                                 linea_disponible: "30000.00",
                                 vehicular: "0",
                                 hipotecario: "0",
@@ -499,8 +499,8 @@ Documentación centralizada de todas las APIs del sistema SBI.
             summary: "Reporte de calificaciones SBS (24 meses)",
             description: "Devuelve historial de calificaciones del cliente en los últimos 24 meses.",
             parameters: [
-              { name: "key", in: "query", required: true, schema: { type: "string" } },
-              { name: "documento", in: "query", required: true, schema: { type: "string" } }
+              { name: "key", in: "query", required: true, schema: { type: "string" }, description: "Token de autorización" },
+              { name: "documento", in: "query", required: true, schema: { type: "string" }, description: "Documento de identidad del cliente a consultar " }
             ],
             responses: {
               "200": {
@@ -572,8 +572,8 @@ Documentación centralizada de todas las APIs del sistema SBI.
             summary: "Consulta detallada de deudas por entidad financiera",
             description: "Devuelve relación de deudas por entidad financiera, tipo de crédito, calificación y monto.",
             parameters: [
-              { name: "key", in: "query", required: true, schema: { type: "string" } },
-              { name: "documento", in: "query", required: true, schema: { type: "string" } }
+              { name: "key", in: "query", required: true, schema: { type: "string" }, description: "Token de autorización" },
+              { name: "documento", in: "query", required: true, schema: { type: "string" }, description: "Documento de identidad del cliente asociado a las deudas" }
             ],
             responses: {
               "200": {
